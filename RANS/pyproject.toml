@@ -1,0 +1,80 @@
+# Copyright (c) Space Robotics Lab, SnT, University of Luxembourg, SpaceR
+# RANS: arXiv:2310.07393 — OpenEnv-compatible implementation
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openenv-rans-env"
+version = "1.0.0"
+description = "RANS spacecraft navigation environment for OpenEnv (arXiv:2310.07393)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0" }
+authors = [
+    { name = "Matteo El-Hariry" },
+    { name = "Antoine Richard", email = "antoine.richard@uni.lu" },
+    { name = "Miguel Olivares-Mendez" },
+]
+keywords = ["reinforcement-learning", "spacecraft", "robotics", "simulation", "openenv"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    # OpenEnv core (server + client utilities)
+    "openenv-core[core]>=0.2.1",
+    # Web server
+    "fastapi>=0.115.0",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.0.0",
+    # Numeric / scientific
+    "numpy>=1.24.0",
+    # HTTP client
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+# Training with the built-in PPO example and Gymnasium wrapper
+train = [
+    "torch>=2.0.0",
+    "gymnasium>=0.29.0",
+]
+# Stable-Baselines3 integration (via gymnasium wrapper)
+sb3 = [
+    "torch>=2.0.0",
+    "gymnasium>=0.29.0",
+    "stable-baselines3>=2.0.0",
+]
+# Optional: full Isaac Gym / OmniIsaacGymEnvs GPU backend
+# (requires a valid NVIDIA Isaac Sim 2023.1.1 installation)
+gpu = [
+    "torch>=2.0.0",
+]
+
+[project.urls]
+"Paper" = "https://arxiv.org/abs/2310.07393"
+"Repository" = "https://github.com/elharirymatteo/RANS"
+"OpenEnv" = "https://github.com/meta-pytorch/OpenEnv"
+
+[project.scripts]
+# Enables:  uv run --project . server
+server = "rans_env.server.app:main"
+
+[tool.setuptools]
+include-package-data = true
+packages = [
+    "rans_env",
+    "rans_env.server",
+    "rans_env.server.tasks",
+]
+package-dir = { "rans_env" = ".", "rans_env.server" = "server", "rans_env.server.tasks" = "server/tasks" }

@@ -1,0 +1,2 @@
+[console_scripts]
+server = rans_env.server.app:main

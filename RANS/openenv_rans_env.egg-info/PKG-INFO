@@ -1,0 +1,30 @@
+Metadata-Version: 2.4
+Name: openenv-rans-env
+Version: 1.0.0
+Summary: RANS spacecraft navigation environment for OpenEnv (arXiv:2310.07393)
+Author: Matteo El-Hariry, Miguel Olivares-Mendez
+Author-email: Antoine Richard <antoine.richard@uni.lu>
+License: GPL-3.0
+Project-URL: Paper, https://arxiv.org/abs/2310.07393
+Project-URL: Repository, https://github.com/elharirymatteo/RANS
+Project-URL: OpenEnv, https://github.com/meta-pytorch/OpenEnv
+Keywords: reinforcement-learning,spacecraft,robotics,simulation,openenv
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Scientific/Engineering :: Physics
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: openenv-core[core]>=0.2.1
+Requires-Dist: fastapi>=0.115.0
+Requires-Dist: uvicorn>=0.24.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: requests>=2.31.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Provides-Extra: gpu
+Requires-Dist: torch>=2.0.0; extra == "gpu"
