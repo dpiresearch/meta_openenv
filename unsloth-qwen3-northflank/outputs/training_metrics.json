@@ -1,0 +1,87 @@
+{
+  "run_info": {
+    "date": "2026-03-08",
+    "model": "HuggingFaceTB/SmolLM-360M-Instruct (CPU test) → Qwen3-14B on Northflank GPU",
+    "base_model_local": "HuggingFaceTB/SmolLM-360M-Instruct",
+    "lora_r": 16,
+    "lora_alpha": 16,
+    "max_steps": 5,
+    "batch_size": 1,
+    "learning_rate": 2e-4,
+    "lr_scheduler": "cosine",
+    "optimizer": "adamw_torch",
+    "trainable_params": 3276800,
+    "total_params": 365097920,
+    "trainable_pct": 0.8975,
+    "device": "CPU (local test)"
+  },
+  "dataset": {
+    "total_samples": 3121,
+    "file": "rans_trajectories.jsonl",
+    "file_size_kb": 7596.6,
+    "tasks": {
+      "GoToPosition": 575,
+      "GoToPose": 724,
+      "TrackLinearVelocity": 822,
+      "TrackLinearAngularVelocity": 1000
+    },
+    "avg_active_thrusters_per_step": 4.0,
+    "thruster_range": [1, 5]
+  },
+  "training": {
+    "global_step": 5,
+    "epoch": 0.0016020506247997437,
+    "total_flos": 4883128320000.0,
+    "train_loss": 1.8145470380783082,
+    "train_runtime_s": 9.778,
+    "train_samples_per_second": 0.511,
+    "train_steps_per_second": 0.511
+  },
+  "log_history": [
+    {
+      "step": 1,
+      "loss": 1.8271,
+      "grad_norm": 0.0673,
+      "learning_rate": 2e-4,
+      "mean_token_accuracy": 0.6419,
+      "entropy": 1.2650,
+      "num_tokens": 512
+    },
+    {
+      "step": 2,
+      "loss": 1.8200,
+      "grad_norm": 0.0667,
+      "learning_rate": 1.809e-4,
+      "mean_token_accuracy": 0.6419,
+      "entropy": 1.2667,
+      "num_tokens": 1024
+    },
+    {
+      "step": 3,
+      "loss": 1.8130,
+      "grad_norm": 0.0697,
+      "learning_rate": 1.309e-4,
+      "mean_token_accuracy": 0.6419,
+      "entropy": 1.2685,
+      "num_tokens": 1536
+    },
+    {
+      "step": 4,
+      "loss": 1.8078,
+      "grad_norm": 0.0710,
+      "learning_rate": 6.91e-5,
+      "mean_token_accuracy": 0.6438,
+      "entropy": 1.2696,
+      "num_tokens": 2048
+    },
+    {
+      "step": 5,
+      "loss": 1.8048,
+      "grad_norm": 0.0728,
+      "learning_rate": 1.91e-5,
+      "mean_token_accuracy": 0.6458,
+      "entropy": 1.2705,
+      "num_tokens": 2560
+    }
+  ]
+}

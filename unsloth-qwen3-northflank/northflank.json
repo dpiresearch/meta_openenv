@@ -1,0 +1,84 @@
+{
+  "$schema": "https://api.northflank.com/v1/schemas/template",
+  "apiVersion": "v1",
+  "spec": {
+    "kind": "Workflow",
+    "spec": {
+      "type": "sequential",
+      "steps": [
+        {
+          "kind": "BuildService",
+          "ref": "qwen3-build",
+          "spec": {
+            "name": "qwen3-14b-build",
+            "billing": {
+              "deploymentPlan": "nf-compute-20"
+            },
+            "vcsData": {
+              "projectUrl": "https://github.com/YOUR_ORG/YOUR_REPO",
+              "projectType": "github",
+              "projectBranch": "main"
+            },
+            "buildSettings": {
+              "dockerfile": {
+                "buildEngine": "kaniko",
+                "dockerfilePath": "/Dockerfile",
+                "dockerfileContext": "/"
+              }
+            }
+          }
+        },
+        {
+          "kind": "Job",
+          "ref": "qwen3-train",
+          "spec": {
+            "name": "qwen3-14b-train",
+            "billing": {
+              "deploymentPlan": "nf-compute-10"
+            },
+            "deployment": {
+              "docker": {
+                "configType": "customCommand",
+                "customCommand": "python /app/train.py"
+              },
+              "buildpack": null,
+              "vcs": null,
+              "instances": 1,
+              "storage": {
+                "ephemeralStorage": {
+                  "storageSize": 51200
+                }
+              },
+              "gpu": {
+                "enabled": true,
+                "gpuType": "a100-40gb",
+                "gpuCount": 1
+              }
+            },
+            "runtimeEnvironment": {
+              "MODEL_NAME": "unsloth/Qwen3-14B-unsloth-bnb-4bit",
+              "MAX_SEQ_LENGTH": "2048",
+              "LOAD_IN_4BIT": "true",
+              "LORA_R": "32",
+              "LORA_ALPHA": "32",
+              "DATASET_NAME": "unsloth/OpenMathReasoning-mini",
+              "DATASET_SPLIT": "cot",
+              "BATCH_SIZE": "2",
+              "GRAD_ACCUM": "4",
+              "MAX_STEPS": "100",
+              "WARMUP_STEPS": "5",
+              "LEARNING_RATE": "2e-4",
+              "OUTPUT_DIR": "/output/qwen3_14b_lora"
+            },
+            "runtimeSecretInjection": {
+              "HF_TOKEN": {
+                "secretId": "hf-credentials",
+                "secretKey": "HF_TOKEN"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
