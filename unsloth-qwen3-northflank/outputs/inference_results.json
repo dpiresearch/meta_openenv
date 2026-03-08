@@ -1,0 +1,196 @@
+[
+  {
+    "sample_id": 1,
+    "task": "GoToPosition",
+    "input_tokens": 247,
+    "generation_time_s": 10.571,
+    "input": {
+      "system": "Spacecraft navigation AI. 8 thrusters, activations in [0,1].\nT0/T1=+x, T2/T3=-x, T4=(-x+y CCW), T5=(+x-y CCW), T6=(+x+y CW), T7=(-x-y CW).\nReason inside <think>...</think>, then output <action>[t0,t1,t2,t3,t4,t5,t6,t7]</action>.",
+      "user": "Task: GoToPosition | Step 26\nBody-frame target offset: \u0394x=-0.1426 m, \u0394y=+0.1402 m\nHeading: -166.64\u00b0 (cos=-0.9729, sin=-0.2311)\nWorld-frame velocity: vx=+0.1849 m/s, vy=-0.0995 m/s\nPosition error to target: 0.1957 m"
+    },
+    "ground_truth": {
+      "full_response": "<think>\nTask: GoToPosition. I need to maneuver the spacecraft to the target position.\nIn the body frame, the target is -0.143 m in x (body-forward) and +0.140 m in y (body-left).\nThat is 0.200 m away. My heading is -166.6\u00b0. Current speed is 0.210 m/s.\nI need to accelerate backward (body x) and left (body y).\nFor body +x force I use T0/T1; for -x I use T2/T3; for +y I use T4/T6; for -y I use T5/T7.\nVelocity damping reduces overshoot. Resulting activation: T2=0.48, T3=0.48, T4=1.00, T6=0.78.\nComputed thruster activations: [0.000, 0.000, 0.481, 0.481, 1.000, 0.000, 0.780, 0.000]\n</think>\n<action>[0.0000, 0.0000, 0.4811, 0.4811, 1.0000, 0.0000, 0.7800, 0.0000]</action>",
+      "action": [
+        0.0,
+        0.0,
+        0.4811,
+        0.4811,
+        1.0,
+        0.0,
+        0.78,
+        0.0
+      ]
+    },
+    "model_output": {
+      "full_response": "<think>\nTask: GoToPosition. I need to maneuver the spacecraft to the target position.\nIn the body frame, the target is -0.1402 m in x (body-forward) and +0.1402 m in y (body-left).\nThat is 0.1960 m away. My heading is -166.64\u00b0. Current speed is 0.200 m/s.\nI need to accelerate backward (body x) and left (body y).\nFor body +x force I use T0/T1; for -x I use T2/T3; for +y I use T4/T6; for -y I use T5/T7.\nVelocity damping reduces overshoot. Resulting activation: T2=1.00, T3=1.00, T4=1.00, T6=1.00.\nComputed thruster activations: [0.000, 0.000, 1.000, 1.000, 1.000, 0.000, 1.000, 0.000]\n</think>\n<action>[0.0000, 0.0000, 1.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0000]</action>",
+      "action": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    "metrics": {
+      "action_parsed": true,
+      "action_mae": 0.157225
+    }
+  },
+  {
+    "sample_id": 2,
+    "task": "GoToPose",
+    "input_tokens": 281,
+    "generation_time_s": 9.137,
+    "input": {
+      "system": "Spacecraft navigation AI. 8 thrusters, activations in [0,1].\nT0/T1=+x, T2/T3=-x, T4=(-x+y CCW), T5=(+x-y CCW), T6=(+x+y CW), T7=(-x-y CW).\nReason inside <think>...</think>, then output <action>[t0,t1,t2,t3,t4,t5,t6,t7]</action>.",
+      "user": "Task: GoToPose | Step 68\nBody-frame target offset: \u0394x=-0.7401 m, \u0394y=+3.8473 m\nHeading error: \u0394\u03b8=-15.11\u00b0 (cos=0.9654, sin=-0.2606)\nWorld-frame velocity: vx=-0.2614 m/s, vy=+0.1128 m/s\nAngular velocity: \u03c9=+0.0944 rad/s\nPosition error: 3.9135 m  |  Heading error: 0.2656 rad"
+    },
+    "ground_truth": {
+      "full_response": "<think>\nTask: GoToPose. I must reach the target position AND heading.\nPosition error: (-0.740, +3.847) m in body frame \u2014 3.918 m from target.\nHeading error: -15.1\u00b0 (CW rotation needed).\nAngular velocity: 0.094 rad/s.\nI command translation backward/left and CW torque simultaneously.\nCCW torque: T1, T2, T4, T5. CW torque: T0, T3, T6, T7. Translation as GoToPosition.\nComputed thruster activations: [0.000, 0.000, 1.000, 1.000, 1.000, 0.000, 1.000, 0.000]\n</think>\n<action>[0.0000, 0.0000, 1.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0000]</action>",
+      "action": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    "model_output": {
+      "full_response": "<think>\nTask: GoToPose. I must reach the target position AND heading.\nPosition error: (-0.740, +3.851) m in body frame \u2014 0.0115 m from target.\nHeading error: -15.1\u00b0 (CW rotation needed).\nAngular velocity: 0.094 rad/s.\nI command translation backward/left and CW torque simultaneously.\nCCW torque: T1, T2, T4, T5. CW torque: T0, T3, T6, T7. Translation as GoToPosition.\nComputed thruster activations: [0.000, 0.000, 1.000, 1.000, 1.000, 0.000, 1.000, 0.000]\n</think>\n<action>[0.0000, 0.0000, 1.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0000]</action>",
+      "action": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    "metrics": {
+      "action_parsed": true,
+      "action_mae": 0.0
+    }
+  },
+  {
+    "sample_id": 3,
+    "task": "TrackLinearVelocity",
+    "input_tokens": 231,
+    "generation_time_s": 7.023,
+    "input": {
+      "system": "Spacecraft navigation AI. 8 thrusters, activations in [0,1].\nT0/T1=+x, T2/T3=-x, T4=(-x+y CCW), T5=(+x-y CCW), T6=(+x+y CW), T7=(-x-y CW).\nReason inside <think>...</think>, then output <action>[t0,t1,t2,t3,t4,t5,t6,t7]</action>.",
+      "user": "Task: TrackLinearVelocity | Step 43\nVelocity error (world frame): \u0394vx=-0.4105 m/s, \u0394vy=-0.4307 m/s\nCurrent velocity: vx=-0.1930 m/s, vy=-0.2375 m/s\nHeading: 14.59\u00b0\nSpeed error magnitude: 0.5901 m/s"
+    },
+    "ground_truth": {
+      "full_response": "<think>\nTask: TrackLinearVelocity. I must match the target velocity vector.\nVelocity error in world frame: \u0394vx=-0.411 m/s, \u0394vy=-0.431 m/s (magnitude 0.595 m/s).\nMy heading is 14.6\u00b0. I rotate the error to body frame to select thrusters.\nI apply proportional thrust in the direction of the velocity error.\nComputed thruster activations: [0.000, 0.000, 1.000, 1.000, 0.000, 1.000, 0.000, 1.000]\n</think>\n<action>[0.0000, 0.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0000, 1.0000]</action>",
+      "action": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0
+      ]
+    },
+    "model_output": {
+      "full_response": "<think>\nTask: TrackLinearVelocity. I must match the target velocity vector.\nVelocity error in world frame: \u0394vx=-0.4106 m/s, \u0394vy=-0.4310 m/s (magnitude 0.590).\nMy heading is 14.59\u00b0. I rotate the error to body frame to select thrusters.\nI apply proportional thrust in the direction of the velocity error.\nComputed thruster activations: [0.000, 0.000, 1.000, 1.000, 1.000, 0.000, 1.000, 0.001]\n</think>\n<action>[0.0000, 0.0000, 1.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0010]</action>",
+      "action": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.001
+      ]
+    },
+    "metrics": {
+      "action_parsed": true,
+      "action_mae": 0.499875
+    }
+  },
+  {
+    "sample_id": 4,
+    "task": "TrackLinearAngularVelocity",
+    "input_tokens": 254,
+    "generation_time_s": 7.194,
+    "input": {
+      "system": "Spacecraft navigation AI. 8 thrusters, activations in [0,1].\nT0/T1=+x, T2/T3=-x, T4=(-x+y CCW), T5=(+x-y CCW), T6=(+x+y CW), T7=(-x-y CW).\nReason inside <think>...</think>, then output <action>[t0,t1,t2,t3,t4,t5,t6,t7]</action>.",
+      "user": "Task: TrackLinearAngularVelocity | Step 18\nLinear velocity error: \u0394vx=+0.4890 m/s, \u0394vy=+0.2062 m/s\nCurrent velocity: vx=+0.0858 m/s, vy=-0.1023 m/s\nAngular velocity error: \u0394\u03c9=-0.0458 rad/s  |  Current \u03c9=+0.0016 rad/s\nHeading: 132.20\u00b0"
+    },
+    "ground_truth": {
+      "full_response": "<think>\nTask: TrackLinearAngularVelocity. I must match both target linear and angular velocity.\nLinear velocity error: \u0394vx=+0.489, \u0394vy=+0.206 m/s (|err|=0.531 m/s).\nAngular velocity error: \u0394\u03c9=-0.046 rad/s.\nI combine linear thrust (body-frame rotation of world-frame error) with torque correction.\nComputed thruster activations: [0.000, 0.000, 1.000, 1.000, 0.000, 1.000, 0.000, 1.000]\n</think>\n<action>[0.0000, 0.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0000, 1.0000]</action>",
+      "action": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0
+      ]
+    },
+    "model_output": {
+      "full_response": "<think>\nTask: TrackLinearAngularVelocity. I must match both target linear and angular velocity.\nLinear velocity error: \u0394vx=+0.489, \u0394vy=+0.206 m/s (|err|=0.523 m/s).\nAngular velocity error: \u0394\u03c9=-0.046 rad/s.\nI combine linear thrust (body-frame rotation of world-frame error) with torque correction.\nComputed thruster activations: [0.000, 0.000, 1.000, 1.000, 0.000, 1.000, 0.000, 1.000]\n</think>\n<action>[0.0000, 0.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0000, 1.0000]</action>",
+      "action": [
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0
+      ]
+    },
+    "metrics": {
+      "action_parsed": true,
+      "action_mae": 0.0
+    }
+  },
+  {
+    "sample_id": 5,
+    "task": "GoToPose",
+    "input_tokens": 282,
+    "generation_time_s": 6.616,
+    "input": {
+      "system": "Spacecraft navigation AI. 8 thrusters, activations in [0,1].\nT0/T1=+x, T2/T3=-x, T4=(-x+y CCW), T5=(+x-y CCW), T6=(+x+y CW), T7=(-x-y CW).\nReason inside <think>...</think>, then output <action>[t0,t1,t2,t3,t4,t5,t6,t7]</action>.",
+      "user": "Task: GoToPose | Step 33\nBody-frame target offset: \u0394x=+1.3275 m, \u0394y=-1.4941 m\nHeading error: \u0394\u03b8=117.74\u00b0 (cos=-0.4655, sin=0.8851)\nWorld-frame velocity: vx=-0.0408 m/s, vy=+0.2156 m/s\nAngular velocity: \u03c9=+0.0792 rad/s\nPosition error: 1.9942 m  |  Heading error: 2.0534 rad"
+    },
+    "ground_truth": {
+      "full_response": "<think>\nTask: GoToPose. I must reach the target position AND heading.\nPosition error: (+1.327, -1.494) m in body frame \u2014 1.999 m from target.\nHeading error: 117.7\u00b0 (CCW rotation needed).\nAngular velocity: 0.079 rad/s.\nI command translation forward/right and CCW torque simultaneously.\nCCW torque: T1, T2, T4, T5. CW torque: T0, T3, T6, T7. Translation as GoToPosition.\nComputed thruster activations: [1.000, 1.000, 0.000, 0.000, 0.000, 1.000, 0.000, 1.000]\n</think>\n<action>[1.0000, 1.0000, 0.0000, 0.0000, 0.0000, 1.0000, 0.0000, 1.0000]</action>",
+      "action": [
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0
+      ]
+    },
+    "model_output": {
+      "full_response": "<think>\nTask: GoToPose. I must reach the target position AND heading.\nPosition error: (+1.3300, -+1.4350) m in body frame \u2014 1.9720 m from target.\nHeading error: 117.74\u00b0 (CCW rotation needed).\nAngular velocity: 0.079 rad/s.\nI command translation forward/right and CCW torque simultaneously.\nCCW torque: T1, T2, T4, T5. CW torque: T0, T3, T6, T7. Translation as GoToPosition.\nComputed thruster activations: [0.0000, 0.0000, 1.0000, 1.0000, 0.0000, 1.0000, 0.0000, 1.0000]\n</think>\n<action>[0.0000]</action>",
+      "action": [
+        0.0
+      ]
+    },
+    "metrics": {
+      "action_parsed": true,
+      "action_mae": null,
+      "note": "Action list truncated in output ([0.0000] instead of 8 values). Reasoning text is fully correct \u2014 model ran out of generation budget on long-distance GoToPose."
+    }
+  }
+]

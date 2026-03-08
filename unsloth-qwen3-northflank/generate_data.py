@@ -62,30 +62,9 @@ np.random.seed(SEED)
 
 # ─── System prompt ────────────────────────────────────────────────────────────
 
-SYSTEM_PROMPT = """You are a spacecraft navigation AI controlling a 2D Modular Floating Platform (MFP2D).
-The platform has 8 thrusters arranged symmetrically. Each thruster activation is a float in [0, 1].
-
-Thruster layout (body frame, r = 0.31 m from centre of mass):
-  T0: pos=( 0,+r), dir=(+1, 0)  → body +x force, slight CW torque
-  T1: pos=( 0,-r), dir=(+1, 0)  → body +x force, slight CCW torque
-  T2: pos=( 0,+r), dir=(-1, 0)  → body -x force, slight CCW torque
-  T3: pos=( 0,-r), dir=(-1, 0)  → body -x force, slight CW torque
-  T4: pos=(+r·√½,+r·√½), dir=(-√½,+√½) → body -x+y force, CCW torque
-  T5: pos=(-r·√½,-r·√½), dir=(+√½,-√½) → body +x-y force, CCW torque
-  T6: pos=(-r·√½,+r·√½), dir=(+√½,+√½) → body +x+y force, CW torque
-  T7: pos=(+r·√½,-r·√½), dir=(-√½,-√½) → body -x-y force, CW torque
-
-State convention:
-  x, y      — world-frame position (m)
-  θ (theta) — heading / yaw angle (rad), positive = CCW from +x world axis
-  vx, vy    — world-frame linear velocity (m/s)
-  ω (omega) — angular velocity (rad/s), positive = CCW
-
-Body frame: x-axis points in the direction of θ; y-axis is 90° CCW from x.
-
-When responding, first reason step-by-step inside <think>...</think> tags,
-then output the thruster command as a JSON array inside <action>...</action> tags.
-"""
+SYSTEM_PROMPT = """Spacecraft navigation AI. 8 thrusters, activations in [0,1].
+T0/T1=+x, T2/T3=-x, T4=(-x+y CCW), T5=(+x-y CCW), T6=(+x+y CW), T7=(-x-y CW).
+Reason inside <think>...</think>, then output <action>[t0,t1,t2,t3,t4,t5,t6,t7]</action>."""
 
 # ─── Proportional controller ─────────────────────────────────────────────────
 
