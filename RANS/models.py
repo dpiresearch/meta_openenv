@@ -14,7 +14,8 @@ These follow the OpenEnv conventions (openenv-core):
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+import json
+from typing import Any, Dict, List, Optional, Union
 
 try:
     from openenv.core.env_server.interfaces import Action, Observation, State
@@ -23,6 +24,8 @@ except ImportError:
     from pydantic import BaseModel as Action  # type: ignore[assignment]
     from pydantic import BaseModel as Observation  # type: ignore[assignment]
     from pydantic import BaseModel as State  # type: ignore[assignment]
+
+from pydantic import field_validator
 
 
 # ---------------------------------------------------------------------------
@@ -33,17 +36,70 @@ class SpacecraftAction(Action):
     """
     Control action for the RANS spacecraft.
 
-    ``thrusters`` is a list of activations, one per thruster, each in [0, 1].
-    For binary (on/off) control pass values of 0.0 or 1.0.
-    The list length should match the thruster count of the configured platform
-    (8 for the default MFP2D layout).
+    Three mutually-exclusive control modes are supported.  The environment
+    picks whichever mode has non-None fields (priority: thrusters > force/torque
+    > velocity target).
 
-    Example (8-thruster, fire thruster 0 only)::
+    **Mode 1 — Thruster activations (default)**
+        ``thrusters``: list of N floats, each in [0, 1].  Length must match the
+        platform's thruster count (8 for the default MFP2D layout).
+        Accepts a comma-separated string from the web UI form.
+        Example::
 
-        SpacecraftAction(thrusters=[1, 0, 0, 0, 0, 0, 0, 0])
+            SpacecraftAction(thrusters=[1, 0, 0, 0, 0, 0, 0, 0])
+
+    **Mode 2 — Direct world-frame force / torque**
+        ``fx``, ``fy``: force components in N (world frame, any sign).
+        ``torque``: yaw torque in N·m (positive = CCW).
+        Bypasses thruster geometry entirely — useful for high-level control
+        or when you don't care about actuator layout.
+        Example::
+
+            SpacecraftAction(fx=2.0, fy=0.0, torque=0.5)
+
+    **Mode 3 — Target velocity (PD controller)**
+        ``vx_target``, ``vy_target``: desired world-frame linear velocities (m/s).
+        ``omega_target``: desired yaw rate (rad/s).
+        The environment applies a proportional controller each step to drive
+        the spacecraft toward the requested velocities.
+        Example::
+
+            SpacecraftAction(vx_target=0.5, vy_target=0.0, omega_target=0.0)
     """
 
-    thrusters: List[float]
+    # ── Mode 1: thruster activations ─────────────────────────────────────
+    thrusters: Optional[List[float]] = None
+
+    # ── Mode 2: direct world-frame force / torque ────────────────────────
+    fx: Optional[float] = None      # N
+    fy: Optional[float] = None      # N
+    torque: Optional[float] = None  # N·m
+
+    # ── Mode 3: velocity targets (PD controller) ─────────────────────────
+    vx_target: Optional[float] = None    # m/s
+    vy_target: Optional[float] = None    # m/s
+    omega_target: Optional[float] = None  # rad/s
+
+    @field_validator("thrusters", mode="before")
+    @classmethod
+    def _coerce_thrusters(cls, v: Any) -> Optional[List[float]]:
+        """Accept JSON-array string, comma-separated string, or None."""
+        if v is None:
+            return None
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return None
+            if v.startswith("["):
+                try:
+                    parsed = json.loads(v)
+                    return parsed if parsed else None
+                except json.JSONDecodeError:
+                    pass
+            # Comma-separated: "0.5,0.5,..."
+            parsed = [float(x.strip()) for x in v.split(",") if x.strip()]
+            return parsed if parsed else None
+        return v
 
 
 # ---------------------------------------------------------------------------

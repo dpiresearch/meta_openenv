@@ -100,10 +100,15 @@ class RANSEnvironment(Environment):
         self._initial_pos_range = initial_pos_range
         self._initial_vel_range = initial_vel_range
 
-        # Physics simulator
-        self._spacecraft = Spacecraft2D(
-            spacecraft_config or SpacecraftConfig.default_8_thruster()
-        )
+        # Physics simulator — RANS_NUM_THRUSTERS overrides spacecraft_config
+        if spacecraft_config is None:
+            n_env = os.environ.get("RANS_NUM_THRUSTERS")
+            if n_env is not None:
+                n = int(n_env)
+                spacecraft_config = SpacecraftConfig.from_num_thrusters(n)
+            else:
+                spacecraft_config = SpacecraftConfig.default_8_thruster()
+        self._spacecraft = Spacecraft2D(spacecraft_config)
 
         # Task
         self._task = TASK_REGISTRY[task](task_config or {})
@@ -136,23 +141,57 @@ class RANSEnvironment(Environment):
         return self._make_observation(reward=0.0, done=False, info=task_info)
 
     def step(self, action: Action) -> Observation:
-        """Apply thruster activations and advance the simulation by one step."""
+        """
+        Advance the simulation by one step.
+
+        Control mode is selected automatically based on which fields are set:
+
+        1. **Thrusters** (``action.thrusters`` is not None):
+           List of per-thruster activations ∈ [0, 1].
+        2. **Force/torque** (``action.fx``, ``action.fy``, or ``action.torque``
+           is not None):
+           Direct world-frame force/torque — bypasses thruster geometry.
+        3. **Velocity target** (``action.vx_target``, ``action.vy_target``, or
+           ``action.omega_target`` is not None):
+           PD controller drives the spacecraft toward the requested velocities.
+        """
         if not hasattr(action, "thrusters"):
             raise ValueError(
-                f"Expected SpacecraftAction (with 'thrusters' field), "
-                f"received {type(action).__name__}."
+                f"Expected SpacecraftAction, received {type(action).__name__}."
             )
 
-        # Validate / reshape activation vector
-        activations = np.array(action.thrusters, dtype=np.float64)
-        n = self._spacecraft.n_thrusters
-        if len(activations) != n:
-            padded = np.zeros(n, dtype=np.float64)
-            padded[: min(len(activations), n)] = activations[:n]
-            activations = padded
+        # ── Mode 1: thruster activations ─────────────────────────────────
+        if action.thrusters is not None:
+            activations = np.array(action.thrusters, dtype=np.float64)
+            n = self._spacecraft.n_thrusters
+            if len(activations) != n:
+                padded = np.zeros(n, dtype=np.float64)
+                padded[: min(len(activations), n)] = activations[:n]
+                activations = padded
+            self._spacecraft.step(activations)
 
-        # Advance physics
-        self._spacecraft.step(activations)
+        # ── Mode 2: direct force / torque ────────────────────────────────
+        elif any(v is not None for v in [action.fx, action.fy, action.torque]):
+            self._spacecraft.step_force_torque(
+                fx_world=float(action.fx or 0.0),
+                fy_world=float(action.fy or 0.0),
+                torque=float(action.torque or 0.0),
+            )
+
+        # ── Mode 3: velocity target ───────────────────────────────────────
+        elif any(
+            v is not None
+            for v in [action.vx_target, action.vy_target, action.omega_target]
+        ):
+            self._spacecraft.step_velocity_target(
+                vx_target=float(action.vx_target or 0.0),
+                vy_target=float(action.vy_target or 0.0),
+                omega_target=float(action.omega_target or 0.0),
+            )
+
+        # ── No action — advance with zero forces ──────────────────────────
+        else:
+            self._spacecraft.step(np.zeros(self._spacecraft.n_thrusters))
         self._step_count += 1
 
         # Compute task reward

@@ -132,6 +132,42 @@ class SpacecraftConfig:
         ]
         return cls(thrusters=thrusters)
 
+    @classmethod
+    def from_num_thrusters(
+        cls,
+        n: int,
+        radius: float = 0.31,
+        force_max: float = 1.0,
+    ) -> "SpacecraftConfig":
+        """
+        Generate a symmetric N-thruster layout around a circle of given radius.
+
+        Thrusters are placed at angles ``2πi/N`` and fire tangentially,
+        alternating CCW/CW so the platform retains 3-DoF controllability.
+
+        Args:
+            n: Number of thrusters (4 ≤ n ≤ 16, must be even).
+            radius: Radial distance from CoM to each thruster (m).
+            force_max: Peak thrust per thruster (N).
+        """
+        if n < 4 or n > 16 or n % 2 != 0:
+            raise ValueError(
+                f"n must be an even integer in [4, 16], got {n}."
+            )
+        thrusters = []
+        for i in range(n):
+            theta = 2.0 * math.pi * i / n
+            px = radius * math.cos(theta)
+            py = radius * math.sin(theta)
+            # Alternate CCW / CW tangential firing direction
+            sign = 1.0 if i % 2 == 0 else -1.0
+            dx = -sign * math.sin(theta)
+            dy =  sign * math.cos(theta)
+            thrusters.append(
+                ThrusterConfig(position=[px, py], direction=[dx, dy], force_max=force_max)
+            )
+        return cls(thrusters=thrusters)
+
 
 # ---------------------------------------------------------------------------
 # Spacecraft dynamics
@@ -231,6 +267,78 @@ class Spacecraft2D:
         self._state[5] = omega + alpha * dt
 
         return self._state.copy()
+
+    def step_force_torque(
+        self,
+        fx_world: float,
+        fy_world: float,
+        torque: float,
+    ) -> np.ndarray:
+        """
+        Advance the simulation by applying world-frame forces and yaw torque
+        directly, bypassing the thruster geometry.
+
+        Args:
+            fx_world: Force in world-frame X direction (N).
+            fy_world: Force in world-frame Y direction (N).
+            torque:   Yaw torque (N·m).  Positive = CCW.
+
+        Returns:
+            New state [x, y, θ, vx, vy, ω].
+        """
+        x, y, theta, vx, vy, omega = self._state
+        dt = self.config.dt
+
+        ax = fx_world / self.config.mass
+        ay = fy_world / self.config.mass
+        alpha = torque / self.config.inertia
+
+        self._state[0] = x + vx * dt + 0.5 * ax * dt * dt
+        self._state[1] = y + vy * dt + 0.5 * ay * dt * dt
+        self._state[2] = self._wrap_angle(theta + omega * dt + 0.5 * alpha * dt * dt)
+        self._state[3] = vx + ax * dt
+        self._state[4] = vy + ay * dt
+        self._state[5] = omega + alpha * dt
+
+        return self._state.copy()
+
+    def step_velocity_target(
+        self,
+        vx_target: float,
+        vy_target: float,
+        omega_target: float,
+        kp: float = 5.0,
+    ) -> np.ndarray:
+        """
+        Advance the simulation by driving toward target velocities via a
+        proportional controller.
+
+        The controller computes the required world-frame force / torque and
+        clips them to the platform's physical limits before applying.
+
+        Args:
+            vx_target:    Desired world-frame X velocity (m/s).
+            vy_target:    Desired world-frame Y velocity (m/s).
+            omega_target: Desired yaw rate (rad/s).
+            kp:           Proportional gain (default 5.0).
+
+        Returns:
+            New state [x, y, θ, vx, vy, ω].
+        """
+        _, _, _, vx, vy, omega = self._state
+
+        fx = kp * self.config.mass * (vx_target - vx)
+        fy = kp * self.config.mass * (vy_target - vy)
+        torque = kp * self.config.inertia * (omega_target - omega)
+
+        # Clip to physical limits
+        f_max = float(np.sum(np.linalg.norm(self._force_mat, axis=0)))
+        tau_max = float(np.sum(np.abs(self._torque_vec)))
+        fx = float(np.clip(fx, -f_max, f_max))
+        fy = float(np.clip(fy, -f_max, f_max))
+        torque = float(np.clip(torque, -tau_max, tau_max))
+
+        return self.step_force_torque(fx, fy, torque)
 
     # ------------------------------------------------------------------
     # Observation helpers
