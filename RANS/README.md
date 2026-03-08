@@ -1,3 +1,19 @@
+---
+title: RANS Spacecraft Navigation Environment
+emoji: 🛸
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+pinned: false
+app_port: 8000
+base_path: /web
+tags:
+  - openenv
+  - reinforcement-learning
+  - robotics
+  - spacecraft
+---
+
 # RANS — OpenEnv Environment
 
 **RANS: Reinforcement Learning based Autonomous Navigation for Spacecrafts**
@@ -9,6 +25,8 @@ OpenEnv-compatible implementation of the paper:
 > [arXiv:2310.07393](https://arxiv.org/abs/2310.07393)
 
 Original GPU implementation (Isaac Gym): [elharirymatteo/RANS](https://github.com/elharirymatteo/RANS)
+
+**Live HuggingFace Space:** https://huggingface.co/spaces/dpang/rans-env
 
 ---
 

@@ -1,6 +1,11 @@
+README.md
+__init__.py
+client.py
+models.py
 pyproject.toml
 ./__init__.py
 ./client.py
+./cubesat_gen.py
 ./models.py
 openenv_rans_env.egg-info/PKG-INFO
 openenv_rans_env.egg-info/SOURCES.txt
